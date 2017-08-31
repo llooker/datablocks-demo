@@ -1,11 +1,9 @@
-include: "/data_sources/weather_bq.model"
-
-explore: weather_facts {}
+include: "/datablocks_gsod/bq.explore"
 
 view: weather_facts {
   derived_table: {
     explore_source: gsod {
-      column: zipcode { field: county_zipcode_mapping.zipcode }
+      column: zipcode { field: zipcode_facts.zipcode }
       column: total_precipitation {}
       filters: {
         field: stations.state
@@ -21,7 +19,7 @@ view: weather_facts_month {
   derived_table: {
     sql_trigger_value: select count(*) ;;
     explore_source: gsod {
-      column: zip_code { field: zipcode_station.zip_code }
+      column: zip_code { field: zipcode_station.zipcode }
       column: date_month {}
       column: total_precipitation {}
       filters: {

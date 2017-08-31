@@ -2,47 +2,62 @@
 # include: "*.view.lkml"         # include all views in this project
 # include: "*.dashboard.lookml"  # include all dashboards in this project
 
-include: "/data_sources/finance.model"
+include: "/data_sources/finance.explore"
 
 view: financial_data {
   derived_table: {
-    sql_trigger_value: select count(*) ;;
+    persist_for: "100 hours"
     explore_source: financial_indicators {
       column: indicator_date {}
-      column: next_indicator_date {}
-      column: description { field: indicators_metadata.description }
-      column: total_value {}
-      column: indicator_growth_yoy { field: indicator_yoy_facts.indicator_growth_yoy }
+      column: value {}
+      column: dataset_code {}
+      column: indicator_name { field: indicators_metadata_codes.indicator_name }
       filters: {
-        field: financial_indicators.category
-        value: "Prices and Inflation"
-      }
-      filters: {
-        field: indicators_metadata.description
-        value: "Consumer Price Index for All Urban Consumers: All Items"
+        field: financial_indicators.dataset_code
+        value: "UNEMPLOY,CPIAUCSL"
       }
     }
   }
-#   dimension: indicator_date {
-#   }
+
+  dimension: primary_key {
+    hidden: yes
+    sql: concat(cast((${TABLE}.indicator_date) as string), ${dataset_code}) ;;
+    primary_key: yes
+  }
 
   dimension_group: indicator {
     type: time
     timeframes: [date, month, year]
-    sql: cast(${TABLE}.indicator_date as date) ;;
+    sql: cast(${TABLE}.indicator_date as timestamp) ;;
     convert_tz: no
   }
-  dimension_group: next_indicator {
-    type: time
-    timeframes: [date, month, year]
-    sql:cast(${TABLE}.next_indicator_date as date) ;;
-    convert_tz: no
+
+  dimension: value {}
+  dimension: dataset_code {}
+  dimension: indicator_name {}
+
+  measure: value_at_start {
+    label: "Value (Start Period)"
+    type: min
+    sql: ${TABLE}.value ;;
   }
-  dimension: primary_key {
-    sql: concat(cast((${TABLE}.indicator_date) as string), ${description}) ;;
-    primary_key: yes
+
+  measure: value_at_end {
+    label: "Value (End Period)"
+    type: max
+    sql: ${TABLE}.value ;;
   }
-  dimension: description {}
-  dimension: total_value {}
-  dimension: indicator_growth_yoy {}
+
+  measure: indicator_growth {
+    label: "Growth (%)"
+    type: percent_of_previous
+    sql: ${value_at_start} ;;
+    value_format_name: decimal_2
+  }
+
+#  measure: inflation_adjusted_value{
+#    type: number
+#    sql: ${order_items.total_revenue} * (${indicator_growth}/100) ;;
+#    value_format_name: decimal_2
+#  }
 }

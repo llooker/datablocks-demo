@@ -49,6 +49,13 @@ view: order_items {
     sql: ${sale_price} ;;
     value_format_name: decimal_1
   }
+  measure: revenue_percentage_growth {
+    type: percent_of_previous
+    sql: ${total_revenue} ;;
+    value_format_name: decimal_1
+  }
+
+
 
   dimension: shipped_at {
     type: string
