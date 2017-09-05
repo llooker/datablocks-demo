@@ -2,6 +2,8 @@ include: "/datablocks_gsod/bq.explore"
 
 view: weather_facts {
   derived_table: {
+    indexes: ["zip_code"]
+
     explore_source: gsod {
       column: zipcode { field: zipcode_facts.zipcode }
       column: total_precipitation {}
@@ -18,6 +20,7 @@ view: weather_facts {
 view: weather_facts_month {
   derived_table: {
     sql_trigger_value: select count(*) ;;
+    indexes: ["zip_code"]
     explore_source: gsod {
       column: zip_code { field: zipcode_station.zipcode }
       column: date_month {}
