@@ -73,6 +73,12 @@ view: order_items {
     sql: ${TABLE}.user_id ;;
   }
 
+  measure: revenue_per_user {
+    type: number
+    sql: ${total_revenue}/NULLIF(${users.count}, 0) ;;
+    value_format_name: usd_0
+  }
+
 #   measure: orders_per_capita {
 #     type: number
 #     sql: ${order_count}/NULLIF(${zip_demographics.total_population}, 0) ;;

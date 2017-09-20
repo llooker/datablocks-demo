@@ -3,6 +3,11 @@ connection: "bigquery_publicdata_standard_sql"
 # # include all the views
 include: "ecomm*.view"
 include: "finance*.view"
+include: "acs*.view"
+
+
+explore: zipcode_income_facts {}
+
 
 
 explore: financial_data {}
@@ -10,6 +15,12 @@ explore: financial_data {}
 explore: order_items {
   join: users {
     sql_on: ${users.id} = ${order_items.user_id} ;;
+    type: left_outer
+    relationship: many_to_one
+  }
+
+  join: zipcode_income_facts {
+    sql_on: ${users.zip} = ${zipcode_income_facts.ZCTA5} ;;
     type: left_outer
     relationship: many_to_one
   }

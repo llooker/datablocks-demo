@@ -7,3 +7,7 @@ local_dependency: {
 local_dependency: {
   project: "data_sources"
 }
+
+local_dependency: {
+  project: "american_community_survey"
+}
