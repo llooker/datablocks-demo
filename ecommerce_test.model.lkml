@@ -1,16 +1,15 @@
 connection: "bigquery_publicdata_standard_sql"
 
-# # include all the views
 include: "ecomm*.view"
 include: "finance*.view"
 include: "acs*.view"
+include: "exchangerate*.view"
 
+include: "/datablocks_exchangerate/explore*"
 
-explore: zipcode_income_facts {}
+# explore: zipcode_income_facts {}
 
-
-
-explore: financial_data {}
+# explore: financial_data {}
 
 explore: order_items {
   join: users {
@@ -59,8 +58,11 @@ explore: order_items {
     type: left_outer
     relationship: many_to_one
   }
+
+  join: forex_historical_real{
+    sql_on: ${order_items.created_date} = ${forex_historical_real.forex_exchange_date} ;;
+    type: left_outer
+    relationship: many_to_one
+
+  }
 }
-
-
-#        ${order_items.created_month} >=  ${financial_data.indicator_date}
-#       and ${order_items.created_date} <  ${financial_data.next_indicator_date}
